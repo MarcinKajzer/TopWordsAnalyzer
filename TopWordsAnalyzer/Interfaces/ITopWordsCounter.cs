@@ -4,6 +4,6 @@ namespace TopWordsAnalyzer.Interfaces;
 
 public interface ITopWordsCounter
 {
-    Result Count(string text, int[] percentageTresholds);
+    Report Count(string text, int[] percentageTresholds);
 }
 

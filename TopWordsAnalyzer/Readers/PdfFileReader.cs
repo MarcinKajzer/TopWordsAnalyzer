@@ -3,7 +3,7 @@ using iTextSharp.text.pdf.parser;
 using System.Text;
 using TopWordsAnalyzer.Interfaces;
 
-namespace TopWordsAnalyzer.Services;
+namespace TopWordsAnalyzer.Readers;
 
 public class PdfFileReader : IFileReader
 {

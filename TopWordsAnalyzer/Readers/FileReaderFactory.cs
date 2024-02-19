@@ -1,7 +1,7 @@
 ﻿using TopWordsAnalyzer.Enums;
 using TopWordsAnalyzer.Interfaces;
 
-namespace TopWordsAnalyzer.Services;
+namespace TopWordsAnalyzer.Readers;
 
 public class FileReaderFactory : IFileReaderFactory
 {

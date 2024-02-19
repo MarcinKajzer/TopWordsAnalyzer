@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using TopWordsAnalyzer.Interfaces;
 
-namespace TopWordsAnalyzer.Services;
+namespace TopWordsAnalyzer.Readers;
 
 public class DocxFileReader : IFileReader
 {

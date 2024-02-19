@@ -1,12 +1,13 @@
 ﻿using System.Text.RegularExpressions;
+using TopWordsAnalyzer.Extensions;
 using TopWordsAnalyzer.Interfaces;
 using TopWordsAnalyzer.Model;
 
-namespace TopWordsAnalyzer.Services
+namespace TopWordsAnalyzer.Helpers
 {
     public class TopWordsCounter : ITopWordsCounter
     {
-        public Result Count(string text, int[] percentageTresholds)
+        public Report Count(string text, int[] percentageTresholds)
         {
             text = RemovePunctuation(text).ToLower();
             var words = ConvertToArr(text);
@@ -45,7 +46,7 @@ namespace TopWordsAnalyzer.Services
             return occurrences.OrderByDescending(o => o.Value).ToDictionary();
         }
 
-        private static Result CountOccurencesForPercentageTresholds(Dictionary<string, int> occurrences, int totalCount, int[] percentageTresholds)
+        private static Report CountOccurencesForPercentageTresholds(Dictionary<string, int> occurrences, int totalCount, int[] percentageTresholds)
         {
             var sortedKeys = occurrences.Keys.ToArray();
 
@@ -84,7 +85,7 @@ namespace TopWordsAnalyzer.Services
                 }
             }
 
-            var result = new Result
+            var result = new Report
             {
                 AllWordsCount = totalCount,
                 AllUniqueWordsCount = sortedKeys.Count(),

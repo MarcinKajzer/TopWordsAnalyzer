@@ -1,6 +1,6 @@
 ﻿using TopWordsAnalyzer.Interfaces;
 
-namespace TopWordsAnalyzer.Services;
+namespace TopWordsAnalyzer.Readers;
 
 public class TxtFileReader : IFileReader
 {

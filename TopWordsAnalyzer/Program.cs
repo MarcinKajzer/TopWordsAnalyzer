@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using TopWordsAnalyzer.Enums;
+using Microsoft.Extensions.Caching.Memory;
+using TopWordsAnalyzer.Helpers;
 using TopWordsAnalyzer.Interfaces;
+using TopWordsAnalyzer.Model;
+using TopWordsAnalyzer.Readers;
 using TopWordsAnalyzer.Services;
 
 
@@ -9,7 +11,9 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services
     .AddScoped<ITopWordsCounter, TopWordsCounter>()
-    .AddScoped<IFileReaderFactory, FileReaderFactory>();
+    .AddScoped<IFileReaderFactory, FileReaderFactory>()
+    .AddScoped<IXlsxReportGenerator, XlsxReportGenerator>()
+    .AddScoped<ITopWordsService, TopWordsService>();
 
 builder.Services.AddCors(options =>
 {
@@ -20,77 +24,30 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 app.UseCors();
 
-app.MapPost("/file", (IFileReaderFactory fileReaderFactory, ITopWordsCounter topWordsCounter, [FromForm] Test test) =>
+
+
+app.MapGet("/download", (IMemoryCache memoryCache, IXlsxReportGenerator xlsxGenerator, Guid? cacheKey) =>
 {
-    //validator
-    if (test.Tresholds is null)
+    if (!memoryCache.TryGetValue<Report>("dd5de719-f38a-4703-b5da-87a895e40798", out var data))
     {
-        return Results.BadRequest("No tresholds defined.");
+        return Results.BadRequest("Raport wygas³.");
     }
 
-    if (test.file is null)
-    {
-        return Results.BadRequest("No file uploaded.");
-    }
+    var excel = xlsxGenerator.Generate(data);
+    return Results.File(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "output.xlsx");    
+});
 
-    int[] tresholds;
-    try
-    {
-        tresholds = JsonConvert.DeserializeObject<int[]>(test.Tresholds);
-    }
-    catch (Exception e)
-    {
-        return Results.BadRequest("Tresholds param should be an array.");
-    }
+app.MapPost("/file", (ITopWordsService reportService, [FromForm] ReportFormData formData) =>
+{
+    return reportService.AnalyzeFile(formData);
 
-    var ext = Path.GetExtension(test.file.FileName).Replace(".", "");
-    var isExtensionValid = Enum.TryParse<FileExtension>(ext, true, out var extension);
-
-    if (!isExtensionValid)
-    {
-        return Results.BadRequest("Invalid file extension.");
-    }
-
-    string text;
-    try
-    {
-        using var stream = test.file.OpenReadStream();
-        var reader = fileReaderFactory.CreateReader(extension);
-        text = reader.Read(stream);
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest();
-    }
-
-    var topWordsResult = topWordsCounter.Count(text, tresholds);
-
-    return Results.Ok(topWordsResult);
-    
 }).DisableAntiforgery();
 
 
 
-
 app.Run();
-
-
-public static class ExtensionMethods
-{
-    public static T DeepCopy<T>(this T self)
-    {
-        var serialized = JsonConvert.SerializeObject(self);
-        return JsonConvert.DeserializeObject<T>(serialized);
-    }
-}
-
-public class Test
-{
-    public IFormFile file { get; set; }
-    public string pole { get; set; }
-    public string Tresholds { get; set; }
-}
