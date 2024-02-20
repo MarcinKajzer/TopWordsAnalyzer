@@ -259,25 +259,23 @@ async function processFile() {
       submitBtn.style.setProperty('--confirm-btn-before-width', `${percentComplete}%`);
     }
   };
+
   xhr.onload = function() {
     submitBtn.querySelector("span").innerText = "Complited"
     if (xhr.status === 200) {
-      clearResult()
-
       const responseData = JSON.parse(xhr.responseText)
-      console.log(responseData);
-
-      resultBtns.style.display = "flex";
-      downloadBtn.href = `${apiUrl}/download?reportId=${responseData.reportId}`;
-
+      
+      clearResult()
+      showResultsBtns(responseData.reportId)
       buildCharts(responseData);
       buildWordsCountSummary(responseData);
-      buildTresholdsTable(responseData);
-      buildWordsList(responseData);
+      buildTresholdsTable(responseData.tresholds);
+      buildWordsList(responseData.wordsOccurriances);
     } else {
       console.log('Request error ocured.');
     }
   };
+
   xhr.send(payload);
 }
 
@@ -293,6 +291,11 @@ function clearResult() {
   }
 }
 
+function showResultsBtns(reportId) {
+  resultBtns.style.display = "flex";
+  downloadBtn.href = `${apiUrl}/download?reportId=${reportId}`;
+}
+
 function buildWordsCountSummary(responseData) {
 
   const allWordsInfo = document.createElement("p")
@@ -304,9 +307,9 @@ function buildWordsCountSummary(responseData) {
   wordsCountSummary.appendChild(uniqueWordsInfo)
 }
 
-function buildTresholdsTable(responseData) {
+function buildTresholdsTable(tresholds) {
 
-  for (const tresholdData of responseData.tresholds) {
+  for (const tresholdData of tresholds) {
     const tresholdWrapper = document.createElement("div");
     const tableHTML = `
         <tr>
@@ -334,9 +337,9 @@ function buildTresholdsTable(responseData) {
   }
 }
 
-function buildWordsList(responseData) {
+function buildWordsList(wordsOccurriances) {
 
-  for (const [key, value] of Object.entries(responseData.wordsOccurriances)) { 
+  for (const [key, value] of Object.entries(wordsOccurriances)) { 
     
     const wordDiv = document.createElement("div");
     wordsList.appendChild(wordDiv);

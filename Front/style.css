@@ -481,6 +481,7 @@ main {
 
   #description {
     width: 50%;
+    z-index: 99;
   }
 
   #confirm-btn {
