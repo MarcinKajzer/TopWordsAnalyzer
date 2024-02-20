@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+  <main>
+    <div id="menu-btns">
+      <button id="upload-file-btn" class="menu-btn active" onclick="setUploadFile(true)">Upload file</button>
+      <button id="enter-text-btn" class="menu-btn" onclick="setUploadFile(false)">Enter text</button>
+    </div>
+
+    <section id="input-section">
+      <div id="description">
+        <div id="header">
+          <h1>Analysis of the top words.</h1>
+          <span id="header-subtitle">Check which words appear most often in the text</span>
+        </div>
+        
+        <p class="description-text">
+          How many words do you need to know to understand 50% of the text you read, and how many to understand 95%?
+          Which words are most common?
+        </p>
+
+        <button class="menu-btn" onclick=openReadMore()>Read more</button>
+
+        <details>
+          <summary>Chose tresholds</summary>
+          <div>
+            <ul id="tesholds-checkboxes"></ul>
+          </div>
+        </details>
+      </div>
+
+      <div id="text-inputs">
+        <textarea id="text-area" placeholder="Your text ..."></textarea>
+
+        <div id="uploader">
+          <h6 class="no-mobile">Drag & Drop File Here</h6>
+          <span class="no-mobile">OR</span>
+          <button class="no-mobile">Browse File</button>
+
+          <h6 class="mobile">Browse file</h6>
+
+          <input id="file-input" type="file" accept=".xlsxm, .pdf, .txt" hidden>
+          <span>Suported files: PDF, DOCX, TXT</span>
+        </div>
+      </div>
+    </section>
+
+    <button id="confirm-btn" onclick="confirm()" disabled>Compute</button>
+
+    <section id="result">
+      <div id="charts">
+        <div>
+          <canvas id="myChart"></canvas>
+        </div>
+        <div>
+          <canvas id="myChart2"></canvas>
+        </div>
+      </div>
+
+      <div id="report-words-count-summary"></div>
+
+      <div id="result-btns">
+        <div>
+          <button id="show-tresholds-btn" class="menu-btn active" onclick="setShowWordsFile(false)">Tresholds</button>
+          <button id="show-words-btn" class="menu-btn" onclick="setShowWordsFile(true)">Words</button>
+        </div>
+        <a id="download-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="Download" width="25" height="25">
+            <path d="M21,14a1,1,0,0,0-1,1v4a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V15a1,1,0,0,0-2,0v4a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V15A1,1,0,0,0,21,14Zm-9.71,1.71a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l4-4a1,1,0,0,0-1.42-1.42L13,12.59V3a1,1,0,0,0-2,0v9.59l-2.29-2.3a1,1,0,1,0-1.42,1.42Z" fill="#ffffff" class="color000000 svgShape"></path>
+          </svg>
+        </a>
+      </div>
+
+      <table id="tresholds-table"></table>
+      <div id="words-list"></div>
+    </section>
+  </main>
+  
+  <div id="read-more">
+    <div>
+      <button onclick="closeReadMore()">Close</button>
+      <p>W procesie zrozumienia tekstu często wydaje się, że kluczem do odszyfrowania sensu leży w poznaniu jak największej liczby słów. Jednakże paradoksalnie, często wystarczy zrozumieć tylko niewielki procent słów, które najczęściej powtarzają się w tekście, aby uzyskać istotne pojęcie na jego temat. To powtarzające się słownictwo często stanowi rdzeń, sedno przekazu, które wskazuje na kluczowe tematy i idee zawarte w tekście.</p>
+      <br>
+      <p>Badania nad analizą tekstu wykazały, że nawet znacząca ilość słów, które nie powtarzają się tak często, może mieć minimalny wpływ na ogólne zrozumienie tekstu. W rzeczywistości, znając tylko te najczęściej występujące słowa, można zrozumieć znaczącą część przekazu. Na przykład, wystarczy zrozumieć często występujące słowa kluczowe w artykule, aby uzyskać ogólne pojęcie na temat poruszanej tematyki, nawet jeśli nie jest się zaznajomionym ze wszystkimi szczegółami lub specjalistycznym słownictwem.</p>
+      <br>
+      <p>Co więcej, znając większą ilość słów niekoniecznie przekłada się na istotny wzrost w zrozumieniu tekstu. Nawet poznając kolejne słowa, zwiększenie zrozumienia może być minimalne, często wynoszące zaledwie ułamki procenta. Jest to związane z tym, że kluczowe pojęcia i idee często powtarzają się w różnych kontekstach, podczas gdy inne słowa mogą być bardziej specyficzne i mniej istotne dla ogólnego przekazu.</p>
+      <br>
+      <p>Oczywiście, istnieją sytuacje, w których znajomość bardziej zaawansowanego słownictwa jest niezbędna, na przykład w przypadku czytania specjalistycznych tekstów naukowych czy literackich dzieł. Jednakże nawet w tych przypadkach, zrozumienie tekstu opiera się na rozumieniu i analizie kluczowych idei oraz powtarzającego się słownictwa, które wyznacza główną osią przekazu.</p>
+      <br>
+      <p>Podsumowując, zrozumienie tekstu często zależy od zrozumienia często powtarzających się słów, które stanowią esencję przekazu. Znajomość kolejnych słów może mieć minimalny wpływ na ogólne zrozumienie, co sugeruje, że kluczowym elementem jest identyfikacja i zrozumienie najważniejszych pojęć i idei zawartych w tekście.</p>
+
+    </div>
+  </div>
+</body>
+</html>
