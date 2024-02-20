@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using TopWordsAnalyzer.Helpers;
 using TopWordsAnalyzer.Interfaces;
 using TopWordsAnalyzer.Model;
@@ -21,6 +20,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("http://127.0.0.1:5500");
+            policy.AllowAnyHeader();
         });
 });
 
@@ -31,23 +31,21 @@ app.UseCors();
 
 
 
-app.MapGet("/download", (IMemoryCache memoryCache, IXlsxReportGenerator xlsxGenerator, Guid? reportId) =>
+app.MapGet("/report", (ITopWordsService reportService, string reportId) =>
 {
-    if (!memoryCache.TryGetValue<Report>(reportId, out var data))
-    {
-        return Results.BadRequest("Raport wygas³.");
-    }
-
-    var excel = xlsxGenerator.Generate(data);
-    return Results.File(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "output.xlsx");    
+    return reportService.GetXlsxReport(reportId);
 });
 
-app.MapPost("/file", (ITopWordsService reportService, [FromForm] ReportFormData formData) =>
+app.MapPost("/file", (ITopWordsService reportService, [FromForm] ReportFileData fileData) =>
 {
-    return reportService.AnalyzeFile(formData);
+    return reportService.AnalyzeFile(fileData);
 
 }).DisableAntiforgery();
 
+app.MapPost("/text", (ITopWordsService reportService, [FromBody] ReportTextData textData) =>
+{
+    return reportService.AnalyzeText(textData);
 
+}).DisableAntiforgery();
 
 app.Run();

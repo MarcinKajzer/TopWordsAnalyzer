@@ -12,6 +12,7 @@
   --button-active-font-weight: 700;
   --confirm-btn-bg-color: #618AF2;
   --confirm-btn--hover-bg-color: #4170e7;
+  --confirm-btn-before-width: 0%;
 }
 
 * {
@@ -220,6 +221,27 @@ main {
   font-size: 14px;
   transition: all .2s;
   cursor: pointer;
+  position: relative;
+
+  span {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    line-height: 45px;
+  }
+}
+
+#confirm-btn::before {
+  content: '';
+  background: green;
+  width: var(--confirm-btn-before-width);
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
 }
 
 #confirm-btn:hover {
@@ -268,6 +290,7 @@ main {
     line-height: 43px;
   }
 }
+
 /* TRESHOLDS TABLE */
 
 #tresholds-table, th, td {
@@ -362,8 +385,6 @@ main {
     cursor: pointer;
   }
 }
-
-
 
 /* READ MORE POPUP */
 

@@ -1,6 +1,10 @@
-﻿namespace TopWordsAnalyzer.Interfaces;
+﻿using TopWordsAnalyzer.Model;
+
+namespace TopWordsAnalyzer.Interfaces;
 
 public interface ITopWordsService
 {
-    IResult AnalyzeFile(ReportFormData reportFormData);
+    IResult AnalyzeFile(ReportFileData reportFormData);
+    IResult AnalyzeText(ReportTextData reportFormData);
+    IResult GetXlsxReport(string reportId);
 }

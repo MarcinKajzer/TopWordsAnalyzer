@@ -14,6 +14,7 @@
 <body>
 
   <main>
+
     <div id="menu-btns">
       <button id="upload-file-btn" class="menu-btn active" onclick="setUploadFile(true)">Upload file</button>
       <button id="enter-text-btn" class="menu-btn" onclick="setUploadFile(false)">Enter text</button>
@@ -57,7 +58,11 @@
       </div>
     </section>
 
-    <button id="confirm-btn" onclick="confirm()" disabled>Compute</button>
+    <button id="confirm-btn" onclick="processFile()" disabled>
+      <span>
+        Compute
+      </span>
+    </button>
 
     <section id="result">
       <div id="charts">

@@ -3,9 +3,10 @@ const apiUrl = "http://localhost:5206"
 const supportedExtensions = ['.pdf', '.docx', '.txt'];
 
 let isMobile = false;
-let isUploadFileChoosen = false;
+let isUploadFileChoosen = true;
 
 let file;
+let text;
 let tresholds = [70, 75, 80, 85, 90, 95]
 
 let chart1;
@@ -116,12 +117,19 @@ function addTresholdSelectorEventListeners() {
 }
   
 function setSubmitButtonActivity() {
-  submitBtn.disabled = file == null || tresholds.length == 0;
+  submitBtn.disabled = isUploadFileChoosen ? (file == null || tresholds.length == 0) : (text == null || text == '' || tresholds.length == 0);
+}
+
+function resetSubmitButtonLoader() {
+  submitBtn.style.setProperty('--confirm-btn-before-width', 0);
+  submitBtn.querySelector("span").innerText = "Compute";
 }
 
 /////////////// MENU BUTTONS /////////////////
 
-function setUploadFile(isUploadFileChoosen) {
+function setUploadFile(value) {
+
+  isUploadFileChoosen = value;
 
   uploader.style.display = isUploadFileChoosen ? "flex" : "none";
   textArea.style.display = isUploadFileChoosen ? "none" : "block";
@@ -131,6 +139,9 @@ function setUploadFile(isUploadFileChoosen) {
 
   activeBtn.classList.add(activeClass);
   inactiveBtn.classList.remove(activeClass);
+
+  setSubmitButtonActivity();
+  resetSubmitButtonLoader();
 }
 
 function setShowWordsFile(isWordsListChoosen) {
@@ -173,6 +184,7 @@ input.addEventListener("change", function(){
   uploader.classList.add("active");
   showFileName();
   setSubmitButtonActivity();
+  resetSubmitButtonLoader();
 });
 
 uploader.addEventListener("dragover", (event)=>{
@@ -197,6 +209,7 @@ uploader.addEventListener("drop", (event)=>{
   file = event.dataTransfer.files[0];
   showFileName(); 
   setSubmitButtonActivity();
+  resetSubmitButtonLoader();
 });
 
 function showFileName(){
@@ -208,24 +221,50 @@ function isValidFileExtension(fileName) {
   return supportedExtensions.includes(`.${fileExtension}`);
 }
 
-/////////////UPLOAD FILE//////////////
+///////////// TEXT AREAT EVENTS ///////////
 
-async function confirm() {
+textArea.addEventListener("input", e => {
+  text = e.target.value;
+  setSubmitButtonActivity();
+})
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('tresholds', JSON.stringify(tresholds));
+///////////// CALL API //////////////
 
-  try {
-    const response = await fetch(`${apiUrl}/file`, {
-      method: 'POST',
-      body: formData
-    });
+async function processFile() {
 
-    if (response.ok) {
+  let payload;
+  const xhr = new XMLHttpRequest();
+
+  if (isUploadFileChoosen) {
+    payload = new FormData();
+    payload.append('file', file);
+    payload.append('tresholds', JSON.stringify(tresholds));
+
+    xhr.open('POST', `${apiUrl}/file`, true);
+  }
+  else {
+    payload =  JSON.stringify({
+      text: textArea.value,
+      tresholds: tresholds
+    })
+
+    xhr.open('POST', `${apiUrl}/text`, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+  }
+
+  xhr.upload.onprogress = e => {
+    submitBtn.querySelector("span").innerText = "Processing..."
+    if (e.lengthComputable) {
+      const percentComplete = (e.loaded / e.total) * 100;
+      submitBtn.style.setProperty('--confirm-btn-before-width', `${percentComplete}%`);
+    }
+  };
+  xhr.onload = function() {
+    submitBtn.querySelector("span").innerText = "Complited"
+    if (xhr.status === 200) {
       clearResult()
 
-      const responseData = await response.json();
+      const responseData = JSON.parse(xhr.responseText)
       console.log(responseData);
 
       resultBtns.style.display = "flex";
@@ -235,13 +274,11 @@ async function confirm() {
       buildWordsCountSummary(responseData);
       buildTresholdsTable(responseData);
       buildWordsList(responseData);
-
     } else {
       console.log('Request error ocured.');
     }
-  } catch (error) {
-    console.error('Request error ocured:', error);
-  }
+  };
+  xhr.send(payload);
 }
 
 function clearResult() {
@@ -313,7 +350,6 @@ function buildWordsList(responseData) {
     wordDiv.appendChild(count);
   }
 }
-
 
 //////////// CHARTS /////////////
  
