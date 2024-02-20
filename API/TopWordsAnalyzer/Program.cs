@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         policy =>
         {
-            policy.WithOrigins("http://127.0.0.1:5500");
+            policy.AllowAnyOrigin();
             policy.AllowAnyHeader();
         });
 });
@@ -29,6 +29,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseCors();
+
+app.MapGet("test", () =>
+{
+    return Results.Ok("Api works");
+});
 
 app.MapGet("/report", (ITopWordsService reportService, string reportId) =>
 {
