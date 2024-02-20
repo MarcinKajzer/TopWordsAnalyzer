@@ -31,9 +31,9 @@ app.UseCors();
 
 
 
-app.MapGet("/download", (IMemoryCache memoryCache, IXlsxReportGenerator xlsxGenerator, Guid? cacheKey) =>
+app.MapGet("/download", (IMemoryCache memoryCache, IXlsxReportGenerator xlsxGenerator, Guid? reportId) =>
 {
-    if (!memoryCache.TryGetValue<Report>("dd5de719-f38a-4703-b5da-87a895e40798", out var data))
+    if (!memoryCache.TryGetValue<Report>(reportId, out var data))
     {
         return Results.BadRequest("Raport wygas³.");
     }

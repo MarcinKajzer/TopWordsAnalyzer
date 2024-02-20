@@ -68,7 +68,7 @@ public class XlsxReportGenerator : IXlsxReportGenerator
 
             Row row4 = new Row();
             row4.Append(new Cell());
-            row4.Append(new Cell(new InlineString(new Text("word1, word2"))));
+            row4.Append(new Cell(new InlineString(new Text(string.Join(", ", treshold.Words)))));
             row4.Append(new Cell());
             sheetData.AppendChild(row4);
 

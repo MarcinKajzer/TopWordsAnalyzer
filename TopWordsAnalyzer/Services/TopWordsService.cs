@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using TopWordsAnalyzer.Enums;
 using TopWordsAnalyzer.Interfaces;
-using TopWordsAnalyzer.Readers;
 
 namespace TopWordsAnalyzer.Services;
 
@@ -64,11 +63,10 @@ public class TopWordsService : ITopWordsService
 
         var topWordsResult = _topWordsCounter.Count(text, tresholds);
 
-        //var cacheKey = Guid.NewGuid();
-        var cacheKey = "dd5de719-f38a-4703-b5da-87a895e40798";
+        var cacheKey = Guid.NewGuid();
         _memoryCache.Set(cacheKey, topWordsResult, TimeSpan.FromMinutes(30));
 
-        //topWordsResult.CacheKey = cacheKey;
+        topWordsResult.ReportId = cacheKey;
         return Results.Ok(topWordsResult);
     }
 }

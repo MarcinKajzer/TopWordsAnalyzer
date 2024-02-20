@@ -1,4 +1,4 @@
-﻿namespace TopWordsAnalyzer.Readers;
+﻿namespace TopWordsAnalyzer.Interfaces;
 
 public interface ITopWordsService
 {
