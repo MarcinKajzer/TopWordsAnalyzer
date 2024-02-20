@@ -7,6 +7,7 @@
 * OpenXml
 * iTextSharp
 * Java Script
+* Chart.js
 * OpenAI (in progress)
 
 ## Main Functionalities:
