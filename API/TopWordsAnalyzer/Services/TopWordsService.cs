@@ -24,33 +24,9 @@ public class TopWordsService : ITopWordsService
 
     public IResult AnalyzeFile(ReportFileData formData)
     {
-        //validator
-        if (formData.Tresholds is null)
+        if (!ValidateFileInput(formData, out var tresholds, out var extension))
         {
-            return Results.BadRequest("No tresholds defined.");
-        }
-
-        if (formData.File is null)
-        {
-            return Results.BadRequest("No file uploaded.");
-        }
-
-        int[] tresholds;
-        try
-        {
-            tresholds = JsonConvert.DeserializeObject<int[]>(formData.Tresholds);
-        }
-        catch (Exception e)
-        {
-            return Results.BadRequest("Tresholds param should be an array.");
-        }
-
-        var ext = Path.GetExtension(formData.File.FileName).Replace(".", "");
-        var isExtensionValid = Enum.TryParse<FileExtension>(ext, true, out var extension);
-
-        if (!isExtensionValid)
-        {
-            return Results.BadRequest("Invalid file extension.");
+            return Results.BadRequest("Invalid input data.");
         }
 
         string text;
@@ -62,37 +38,52 @@ public class TopWordsService : ITopWordsService
         }
         catch (Exception ex)
         {
-            return Results.BadRequest();
+            return Results.BadRequest(ex.Message);
         }
 
         var topWordsResult = _topWordsCounter.Count(text, tresholds);
-
-        var cacheKey = Guid.NewGuid();
-        _memoryCache.Set(cacheKey, topWordsResult, TimeSpan.FromMinutes(30));
-
-        topWordsResult.ReportId = cacheKey;
+        _memoryCache.Set(topWordsResult.ReportId.ToString(), topWordsResult, TimeSpan.FromMinutes(30));
         return Results.Ok(topWordsResult);
+    }
+
+    private bool ValidateFileInput(ReportFileData formData, out int[] tresholds,  out FileExtension extension)
+    {
+        tresholds = null;
+        extension = FileExtension.Txt;
+
+        if (formData.Tresholds is null || formData.File is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            tresholds = JsonConvert.DeserializeObject<int[]>(formData.Tresholds);
+        }
+        catch
+        {
+            return false;
+        }
+
+        var ext = Path.GetExtension(formData.File.FileName).Replace(".", "");
+        var isExtensionValid = Enum.TryParse<FileExtension>(ext, true, out extension);
+        if (!isExtensionValid)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public IResult AnalyzeText(ReportTextData textData)
     {
-        //validator
-        if (textData.Tresholds is null)
+        if (textData.Tresholds is null || textData.Text is null)
         {
-            return Results.BadRequest("No tresholds defined.");
-        }
-
-        if (textData.Text is null)
-        {
-            return Results.BadRequest("No text provided.");
+           return Results.BadRequest("Invalid input data.");
         }
 
         var topWordsResult = _topWordsCounter.Count(textData.Text, textData.Tresholds);
-
-        var cacheKey = Guid.NewGuid();
-        _memoryCache.Set(cacheKey, topWordsResult, TimeSpan.FromMinutes(30));
-
-        topWordsResult.ReportId = cacheKey;
+        _memoryCache.Set(topWordsResult.ReportId.ToString(), topWordsResult, TimeSpan.FromMinutes(30));
         return Results.Ok(topWordsResult);
     }
 
@@ -104,6 +95,6 @@ public class TopWordsService : ITopWordsService
         }
 
         var excel = _reportGenerator.Generate(data);
-        return Results.File(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "output.xlsx");
+        return Results.File(excel, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Top_Words_Report.xlsx");
     }
 }

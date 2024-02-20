@@ -14,6 +14,8 @@ builder.Services
     .AddScoped<IXlsxReportGenerator, XlsxReportGenerator>()
     .AddScoped<ITopWordsService, TopWordsService>();
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(
@@ -24,12 +26,9 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddMemoryCache();
-
 var app = builder.Build();
+
 app.UseCors();
-
-
 
 app.MapGet("/report", (ITopWordsService reportService, string reportId) =>
 {

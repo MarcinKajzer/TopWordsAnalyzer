@@ -1,5 +1,5 @@
 const activeClass = "active"
-const apiUrl = "http://localhost:5206"
+const apiUrl = "http://145.239.86.225:5000"
 const supportedExtensions = ['.pdf', '.docx', '.txt'];
 
 let isMobile = false;
@@ -293,7 +293,7 @@ function clearResult() {
 
 function showResultsBtns(reportId) {
   resultBtns.style.display = "flex";
-  downloadBtn.href = `${apiUrl}/download?reportId=${reportId}`;
+  downloadBtn.href = `${apiUrl}/report?reportId=${reportId}`;
 }
 
 function buildWordsCountSummary(responseData) {

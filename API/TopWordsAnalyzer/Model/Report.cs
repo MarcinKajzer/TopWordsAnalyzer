@@ -6,5 +6,5 @@ public class Report
     public int AllUniqueWordsCount { get; set; }
     public Dictionary<string, int> WordsOccurriances { get; set; }
     public List<Treshold> Tresholds { get; set; } = new();
-    public Guid ReportId { get; set; }
+    public Guid ReportId { get; set; } = Guid.NewGuid();
 }
