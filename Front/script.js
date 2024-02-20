@@ -1,5 +1,5 @@
 const activeClass = "active"
-const apiUrl = "http://145.239.86.225:5000"
+const apiUrl = "http://145.239.86.225/api"
 const supportedExtensions = ['.pdf', '.docx', '.txt'];
 
 let isMobile = false;
