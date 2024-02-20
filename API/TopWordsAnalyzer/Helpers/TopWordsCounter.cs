@@ -21,11 +21,8 @@ namespace TopWordsAnalyzer.Helpers
         
         private string RemoveNumbers(string text) => Regex.Replace(text, @"\d", " ");
         
-        private string[] ConvertToArr(string text)
-        {
-            return text.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
-        }
-
+        private string[] ConvertToArr(string text) => text.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+        
         private static Dictionary<string, int> CountWordOccurrences(string[] array)
         {
             Dictionary<string, int> occurrences = new Dictionary<string, int>();
