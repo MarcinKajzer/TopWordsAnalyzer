@@ -10,19 +10,18 @@ namespace TopWordsAnalyzer.Helpers
         public Report Count(string text, int[] percentageTresholds)
         {
             text = RemovePunctuation(text).ToLower();
+            text = RemoveNumbers(text);
             var words = ConvertToArr(text);
             var wordOccurrences = CountWordOccurrences(words);
 
             return CountOccurencesForPercentageTresholds(wordOccurrences, words.Length, percentageTresholds);
         }
 
-
-        private static string RemovePunctuation(string text)
-        {
-            return Regex.Replace(text, @"[^\w\s\r]", " ").Replace("\n", " ");
-        }
-
-        private static string[] ConvertToArr(string text)
+        private string RemovePunctuation(string text) => Regex.Replace(text, @"[^\w\s\r]", " ").Replace("\n", " ");
+        
+        private string RemoveNumbers(string text) => Regex.Replace(text, @"\d", " ");
+        
+        private string[] ConvertToArr(string text)
         {
             return text.Split(" ").Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
         }
@@ -46,7 +45,7 @@ namespace TopWordsAnalyzer.Helpers
             return occurrences.OrderByDescending(o => o.Value).ToDictionary();
         }
 
-        private static Report CountOccurencesForPercentageTresholds(Dictionary<string, int> occurrences, int totalCount, int[] percentageTresholds)
+        private Report CountOccurencesForPercentageTresholds(Dictionary<string, int> occurrences, int totalCount, int[] percentageTresholds)
         {
             var sortedKeys = occurrences.Keys.ToArray();
 
