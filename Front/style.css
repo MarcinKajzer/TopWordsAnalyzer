@@ -67,6 +67,7 @@ main {
   display: flex;
   flex-direction: column;;
   justify-content: space-between;
+  z-index: 99;
 
   #header {
     margin-bottom: 30px;
@@ -481,7 +482,6 @@ main {
 
   #description {
     width: 50%;
-    z-index: 99;
   }
 
   #confirm-btn {

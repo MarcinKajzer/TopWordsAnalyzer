@@ -27,6 +27,8 @@ const wordsCountSummary = document.querySelector("#report-words-count-summary");
 const resultBtns = document.querySelector("#result-btns");
 const downloadBtn = document.querySelector("#download-btn");
 
+const details = document.querySelector("details");
+
 //////////// DIFFEREN BEHAVIOUR FOR MOBILE ////////////
 
 if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
@@ -111,6 +113,12 @@ function addTresholdSelectorEventListeners() {
     }
 
     details.open = !details.open;
+  });
+
+  document.addEventListener('click', (event) => {
+    if (event.target.closest("details") == null) {
+      details.open = false;
+    }
   });
 
   details.dispatchEvent(new Event('toggle'));
